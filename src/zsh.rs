@@ -21,27 +21,79 @@
 // Use BufReader::read_until(), ' ' and '\n' and ';'
 
 // Still need a way to ignore u16 when iterating over BufReader()
+// try using a match statment with Some(x) use x, with None we could skip, but because the iterator
+// returns None when there are no more bytes to iterate, we should count consecutive Nones and if
+// the None surpass a limit, we can exit.
+
+const SKIP_RANGE: u8 = 14; // How many chars to skip to get to cmd
+
+//const NONE_RATE: u8 = 255; // How many non UTF-8 chars we can meet before we give up on the file
 
 use std::{
     collections::HashMap,
     fs::File,
-    io::{BufReader, Read},
+    io::{BufReader, Bytes, Read},
 };
 
-pub struct Zsh {
-    collection: HashMap<String, usize>,
+pub fn genHashMap(file: File) -> HashMap<String, usize> {
+    let mut map = HashMap::new();
+    let mut prog: Vec<u8> = Vec::new(); // here is where we collect
+    let mut iter = BufReader::with_capacity(file.metadata().unwrap().len() as usize, file).bytes();
+
+    // TODO: Add collector and skip function calls here
+    iter.next(); // buffer to remove the ':' from the first case
+
+    /*
+     * Example of the line types that we need to parse
+     * : 1729482722:0;systemctl hybrid-sleep
+     * : 1729543437:0;eval $(ssh-agent)
+     */
+    map
 }
 
-impl Zsh {
-    pub fn new(file: File) -> Self {
-        Self {
-            collection: {
-                let mut map = HashMap::new();
-                let mut col: Vec<u8> = Vec::new();
-                let buffer =
-                    BufReader::with_capacity(file.metadata().unwrap().len() as usize, file);
-                map
+fn collector(iter: &mut Bytes<BufReader<File>>, prog: &mut Vec<u8>) {
+    for _ in [..SKIP_RANGE] {
+        iter.next();
+    }
+    loop {
+        match iter.next() {
+            Some(x) => match x {
+                Ok(y) => {
+                    if y != ' ' as u8 {
+                        prog.push(y);
+                    } else {
+                        break;
+                    }
+                }
+                _ => continue, // catching any error here because Err doesn't work? Need to
+                               // insvestigate more later.
             },
+            None => break,
+        }
+    }
+}
+/*
+ * Looping over iter until we meet the patern '\n:'
+ */
+fn skip(iter: &mut Bytes<BufReader<File>>) {
+    let mut str1: u8 = ' ' as u8;
+    let mut str2: u8;
+    loop {
+        match iter.next() {
+            Some(x) => match x {
+                Ok(x) => {
+                    str2 = str1;
+                    str1 = x;
+                    if str1 == '\n' as u8 && str2 == ':' as u8 {
+                        return;
+                    }
+                }
+                _ => {
+                    str2 = str1;
+                    str1 = ' ' as u8;
+                }
+            },
+            None => break,
         }
     }
 }

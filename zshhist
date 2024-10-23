@@ -1,0 +1,111 @@
+: 1728750940:0;sudo nv /etc/default/grub
+: 1728751031:0;grep LINUX_DEF etc/default/grub
+: 1728751035:0;grep LINUX_DEF /etc/default/grub
+: 1729388528:0;ll
+: 1729402253:0;systemctl hybrid-sleep
+: 1729402258:0;free
+: 1729402299:0;systemctl poweroff
+: 1729457964:0;Hyprland
+: 1729461170:0;mpv 2024-10-20\ 18-30-43.mkv
+: 1729464003:0;ll
+: 1729482722:0;systemctl hybrid-sleep
+: 1729543437:0;eval $(ssh-agent)
+: 1729552312:0;cd
+: 1729552314:0;ll
+: 1729552416:0;systemctl hybrid-sleep
+: 1729637592:0;Hyprland
+: 1729637633:0;cd dev/dotfiles/wm/hypr/
+: 1729637634:0;ls
+: 1729637635:0;nv hyprland.conf
+: 1729637650:0;ll
+: 1729638628:0;ls
+: 1729638634:0;ll
+: 1729638703:0;cd raw/portal/October
+: 1729638704:0;cd 4
+: 1729638705:0;ll
+: 1729639479:0;ll
+: 1729639480:0;cd
+: 1729639481:0;cd pr
+: 1729639483:0;cd dev
+: 1729639484:0;ls
+: 1729639486:0;cd apps
+: 1729639486:0;ls
+: 1729639494:0;cd style
+: 1729639494:0;ls
+: 1729639497:0;nv Cargo.toml
+: 1729639536:0;cd
+: 1729639537:0;cd dev/dotfiles
+: 1729639538:0;ll
+: 1729639602:0;cd wm/hypr
+: 1729639603:0;l
+: 1729639613:0;nv conf/keymap.conf
+: 1729639939:0;pactl get-default-source
+: 1729639963:0;pactl set-source-volume $( pactl get-default-source ) +5%
+: 1729639977:0;pactl get-default-source
+: 1729639984:0;pactl get-default-sink
+: 1729639991:0;pactl set-source-volume $( pactl get-default-sink ) +5%
+: 1729640000:0;pactl set-sink-volume $( pactl get-default-sink ) +5%
+: 1729640162:0;pactl set-sink-mute $( pactl get-default-sink )
+: 1729640166:0;pactl set-sink-mute $( pactl get-default-sink ) toggle
+: 1729640177:0;pactl set-sink-mute $( pactl get-default-sink ) toggle | wl-copy
+: 1729640528:0;sudo pacman -S playerctl
+: 1729640547:0;zrel
+: 1729640554:0;playerctl 
+: 1729640567:0;playerctl play-pause
+: 1729640593:0;playerctl next
+: 1729640600:0;playerctl previous
+: 1729640675:0;ll
+: 1729640678:0;cd scripts/
+: 1729640680:0;cd ..
+: 1729640680:0;ll
+: 1729640686:0;touch README.org
+: 1729640687:0;ll
+: 1729640691:0;rm README.org
+: 1729640692:0;cd ..
+: 1729640693:0;ll
+: 1729640701:0;touch README.org
+: 1729640702:0;ll
+: 1729640704:0;cd ..
+: 1729640705:0;ll
+: 1729640743:0;cd wm/hypr
+: 1729640747:0;nv conf/keymap.conf
+: 1729640818:0;playerctl volume +5%
+: 1729640822:0;playerctl volume +5
+: 1729640840:0;playerctl status
+: 1729640846:0;playerctl metadata
+: 1729640919:0;pactl send-message --help
+: 1729640929:0;pactl info
+: 1729640983:0;ll
+: 1729641422:0;cd ..
+: 1729641423:0;ll
+: 1729641570:0;onefetch
+: 1729641802:0;cd
+: 1729641806:0;cd dev/apps/style
+: 1729641808:0;ll
+: 1729641809:0;onefetch
+: 1729653235:0;systemctl hybrid-sleep
+: 1729713316:0;ll
+: 1729713318:0;cd ..
+: 1729713321:0;rm -r style
+: 1729713346:0;git clone git@github.com:hypnotics-dev/zsh-frequency.git
+: 1729713354:0;ls
+: 1729713359:0;cd zsh-frequency\
+\
+
+: 1729713363:0;ll
+: 1729714668:0;cargo build
+: 1729714676:0;ll
+: 1729714686:0;nv src/zsh.rs
+: 1729714701:0;cd
+: 1729714703:0;cd dev/dotfiles
+: 1729714703:0;ll
+: 1729714736:0;cd editor/nvim/lua/config
+: 1729714737:0;ll
+: 1729714746:0;cp .hardware-template.lua ./hardware.lua
+: 1729714748:0;nv hardware.lua
+: 1729714780:0;cd 
+: 1729714787:0;cd dev/apps/zsh-frequency
+: 1729714788:0;ll
+: 1729714792:0;nv src/zsh.rs
+: 1729715041:0;ll
+: 1729718320:0;cp ~/.zsh_history ./

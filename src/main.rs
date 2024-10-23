@@ -5,8 +5,6 @@ use std::env;
 use std::fs::File;
 use std::path::Path;
 
-use zsh::Zsh;
-
 // TODO: Read a file, print it's contents
 
 fn main() {
@@ -22,6 +20,4 @@ fn main() {
         Err(err) => panic!("Couldn't open {}: {}", file_path.display(), err),
         Ok(file) => file,
     };
-
-    let _ = Zsh::new(file);
 }
