@@ -1,0 +1,14 @@
+: 1729482722:0;systemctl hybrid-sleep
+: 1728751031:0;grep LINUX_DEF etc/default/grub
+: 1728751035:0;grep LINUX_DEF /etc/default/grub
+: 1729388528:0;ll
+: 1729402253:0;systemctl hybrid-sleep
+: 1729402258:0;free
+: 1729402299:0;systemctl poweroff
+: 1729457964:0;Hyprland
+: 1729461170:0;mpv 2024-10-20\ 18-30-43.mkv
+: 1729464003:0;ll
+: 1729482722:0;systemctl hybrid-sleep
+: 1729543437:0;eval $(ssh-agent)
+: 1729552312:0;cd
+: 1729552314:0;ll

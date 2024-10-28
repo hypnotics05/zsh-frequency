@@ -1,3 +1,4 @@
+#[allow(dead_code)]
 const SKIP_RANGE: u8 = 14; // How many chars to skip to get to cmd
 
 /*
@@ -15,6 +16,7 @@ use std::{
     io::{BufReader, Bytes, Read},
 };
 
+#[allow(dead_code)]
 pub fn gen_hash_map(file: File) -> HashMap<String, usize> {
     let mut map: HashMap<String, usize> = HashMap::new();
     let mut prog: Vec<u8> = Vec::new(); // here is where we collect
@@ -32,22 +34,22 @@ pub fn gen_hash_map(file: File) -> HashMap<String, usize> {
     map
 }
 
+#[allow(dead_code)]
 fn collector(iter: &mut Bytes<BufReader<File>>, prog: &mut Vec<u8>) -> bool {
     // skips ": NUM:0;"
     for _ in 0..SKIP_RANGE {
         iter.next();
     }
+    let mut str1: u8 = 0;
+    let mut str2: u8;
     // tries to build string
-    let mut has_buf: bool = false;
-    let mut buf: u8 = 0;
     loop {
         match iter.next() {
             Some(x) => match x {
                 Ok(y) => {
                     if y != ' ' as u8 {
                         if y == '\n' as u8 {
-                            has_buf = true;
-                            buf = y;
+                            str1 = y;
                             break;
                         }
                         prog.push(y);
@@ -61,12 +63,6 @@ fn collector(iter: &mut Bytes<BufReader<File>>, prog: &mut Vec<u8>) -> bool {
             // Should we panic here?
             None => return false, // exit function, no more file to read
         }
-    }
-    let mut str1: u8 = ' ' as u8;
-    let mut str2: u8;
-    if has_buf {
-        str1 = buf;
-        has_buf = false;
     }
     loop {
         match iter.next() {
@@ -95,19 +91,6 @@ mod test {
     use super::*;
     use std::{path::Path, usize};
 
-    fn build_default_map() -> HashMap<String, usize> {
-        HashMap::from([
-            (String::from("ll"), 3),
-            (String::from("systemctl"), 4),
-            (String::from("grep"), 2),
-            (String::from("free"), 1),
-            (String::from("Hyprland"), 1),
-            (String::from("mpv"), 1),
-            (String::from("eval"), 1),
-            (String::from("cd"), 1),
-        ])
-    }
-
     fn iterator(path: &str) -> Bytes<BufReader<File>> {
         let file = open_file(path);
         BufReader::with_capacity(file.metadata().unwrap().len() as usize, file).bytes()
@@ -131,7 +114,7 @@ mod test {
     #[test]
     fn test_collector_build_single() {
         let mut prog: Vec<u8> = Vec::new();
-        let mut iter = iterator("test/collector-build-single.log");
+        let mut iter = iterator("test/collector-build-single");
         iter.next();
         let _ = collector(&mut iter, &mut prog);
         assert_eq!(prog, vec_u8_from_str("systemctl"));
@@ -139,17 +122,24 @@ mod test {
 
     #[test]
     fn test_collector_build_map() {
-        assert_eq!(
-            gen_hash_map(open_file("test/collector-build-map.log")),
-            build_default_map()
-        );
+        let map = HashMap::from([
+            (String::from("ll"), 3),
+            (String::from("systemctl"), 4),
+            (String::from("grep"), 2),
+            (String::from("free"), 1),
+            (String::from("Hyprland"), 1),
+            (String::from("mpv"), 1),
+            (String::from("eval"), 1),
+            (String::from("cd"), 1),
+        ]);
+        assert_eq!(gen_hash_map(open_file("test/collector-build-map")), map);
     }
 
     #[test]
     fn test_collector_multi() {
         let mut first: Vec<u8> = Vec::new();
         let mut second: Vec<u8> = Vec::new();
-        let mut iter = iterator("test/collector-2-strings.log");
+        let mut iter = iterator("test/collector-2-strings");
         iter.next();
         let _ = collector(&mut iter, &mut first);
         let _ = collector(&mut iter, &mut second);
@@ -161,5 +151,8 @@ mod test {
 
     // tests if skip section can infact skip past utf-16 chars
     #[test]
-    fn test_collector_build_map_utf_16() {}
+    fn test_collector_build_map_utf_16() {
+        let map = HashMap::from([(String::from("mpv"), 7)]);
+        assert_eq!(gen_hash_map(open_file("test/map-utf-16")), map);
+    }
 }

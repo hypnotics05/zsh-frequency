@@ -1,0 +1,2 @@
+: 1729482722:0;systemctl hybrid-sleep
+: 1728751031:0;grep LINUX_DEF etc/default/grub
