@@ -12,6 +12,7 @@ use std::{
     io::{BufReader, Bytes, Read},
 };
 
+// FIXME: hash map is missing most values, why?
 pub fn gen_hash_map(file: File) -> HashMap<String, usize> {
     let mut map: HashMap<String, usize> = HashMap::new();
     let mut prog: Vec<u8> = Vec::new(); // here is where we collect
@@ -30,7 +31,7 @@ pub fn gen_hash_map(file: File) -> HashMap<String, usize> {
 // keeping this as seperate function for now, incase we want to expand functionality at some point
 fn collector(iter: &mut Bytes<BufReader<File>>, prog: &mut Vec<u8>) -> bool {
     // skips ": NUM:0;"
-    for _ in 0..=SKIP_RANGE {
+    for _ in 0..SKIP_RANGE {
         iter.next();
     }
     // tries to build string
@@ -47,6 +48,7 @@ fn collector(iter: &mut Bytes<BufReader<File>>, prog: &mut Vec<u8>) -> bool {
                 _ => continue, // catching any error here because Err doesn't work?
             },
             // Might not be nescesary as if this where to occur, the file is missformatted
+            // Should we panic here?
             None => return false, // exit function, no more file to read
         }
     }
@@ -70,4 +72,64 @@ fn collector(iter: &mut Bytes<BufReader<File>>, prog: &mut Vec<u8>) -> bool {
             None => return false,
         }
     }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    use std::{path::Path, usize};
+
+    fn build_default_map() -> HashMap<String, usize> {
+        HashMap::from([
+            (String::from("ll"), 3),
+            (String::from("systemctl"), 4),
+            (String::from("grep"), 2),
+            (String::from("free"), 1),
+            (String::from("Hyprland"), 1),
+            (String::from("mpv"), 1),
+            (String::from("eval"), 1),
+            (String::from("cd"), 1),
+        ])
+    }
+
+    fn iterator(path: &str) -> Bytes<BufReader<File>> {
+        let file = open_file(path);
+        BufReader::with_capacity(file.metadata().unwrap().len() as usize, file).bytes()
+    }
+
+    fn open_file(path: &str) -> File {
+        match File::open(Path::new(&path)) {
+            Err(err) => panic!("Couldn't open {}: {}", path, err),
+            Ok(file) => return file,
+        }
+    }
+
+    fn vec_u8_from_str(target: &str) -> Vec<u8> {
+        let mut vec: Vec<u8> = Vec::new();
+        for c in target.chars() {
+            vec.push(c as u8);
+        }
+        vec
+    }
+
+    #[test]
+    fn test_collector_build_single() {
+        let mut prog: Vec<u8> = Vec::new();
+        let mut iter = iterator("test/collector-build-single.log");
+        let _ = collector(&mut iter, &mut prog);
+        assert_eq!(prog, vec_u8_from_str("systemctl"));
+    }
+
+    // Failing test, only "systemcl" is being read, and only twice.
+    #[test]
+    fn test_collector_build_map() {
+        assert_eq!(
+            gen_hash_map(open_file("test/collector-build-map.log")),
+            build_default_map()
+        );
+    }
+
+    // tests if skip section can infact skip past utf-16 chars
+    #[test]
+    fn test_collector_build_map_utf_16() {}
 }
