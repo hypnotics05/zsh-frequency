@@ -1,12 +1,6 @@
 #[allow(dead_code)]
 const SKIP_RANGE: u8 = 14; // How many chars to skip to get to cmd
 
-/*
- * Example of the line that we need to parse
- * : 1729482722:0;systemctl hybrid-sleep
- * : 1729543437:0;eval $(ssh-agent)
- */
-
 // TODO: add support for sudo, both by reading command after sudo and counting the number of sudo
 // TODO: Add support to read inline commands
 
@@ -114,7 +108,7 @@ mod test {
     #[test]
     fn test_collector_build_single() {
         let mut prog: Vec<u8> = Vec::new();
-        let mut iter = iterator("test/collector-build-single");
+        let mut iter = iterator("tests/collector-build-single");
         iter.next();
         let _ = collector(&mut iter, &mut prog);
         assert_eq!(prog, vec_u8_from_str("systemctl"));
@@ -132,14 +126,14 @@ mod test {
             (String::from("eval"), 1),
             (String::from("cd"), 1),
         ]);
-        assert_eq!(gen_hash_map(open_file("test/collector-build-map")), map);
+        assert_eq!(gen_hash_map(open_file("tests/collector-build-map")), map);
     }
 
     #[test]
     fn test_collector_multi() {
         let mut first: Vec<u8> = Vec::new();
         let mut second: Vec<u8> = Vec::new();
-        let mut iter = iterator("test/collector-2-strings");
+        let mut iter = iterator("tests/collector-2-strings");
         iter.next();
         let _ = collector(&mut iter, &mut first);
         let _ = collector(&mut iter, &mut second);
@@ -153,6 +147,6 @@ mod test {
     #[test]
     fn test_collector_build_map_utf_16() {
         let map = HashMap::from([(String::from("mpv"), 7)]);
-        assert_eq!(gen_hash_map(open_file("test/map-utf-16")), map);
+        assert_eq!(gen_hash_map(open_file("tests/map-utf-16")), map);
     }
 }
