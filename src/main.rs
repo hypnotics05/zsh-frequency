@@ -1,17 +1,16 @@
-mod lib;
+mod helpers;
+mod test;
 mod zsh;
 
 use clap::{Args, Parser, Subcommand};
 use core::panic;
-use lib::top;
-use std::alloc::System;
+use helpers::{bot, top};
 use std::collections::HashMap;
+use std::env;
 use std::fs::File;
 use std::path::{Path, PathBuf};
-use std::{env, usize};
+use std::process::exit;
 
-// TODO: Refactor test code to test.rs
-// TODO: Parse cli arguments
 // TODO: Display results
 
 #[derive(Parser, Debug)]
@@ -56,7 +55,6 @@ fn main() {
     // --file PATH read from file
     // -m create minimal graph
     // -s don't count sudo as seperate command
-    // -r recursively evaluate expressions (so eval $(ssh-agent) would return both eval and ssh-agent)
     // top N returns the N top used results
     // bot N returns the N least used results
     // Needs more options for Filter, and sorting
@@ -74,17 +72,22 @@ fn main() {
         Ok(file) => file,
     };
 
+    // HACK:
+
+    //println!("{}", final_path.display());
+
     match &cli.command {
         Commands::Top(arg) => {
             let n = arg.num.unwrap_or_else(|| MIN);
+            //println!("{n}");
             if n < 1 {
                 println!("N must be bigger than 0");
-                std::process::exit(1);
+                exit(1);
             }
             if !cli.sudo {
                 let map: HashMap<String, usize> = zsh::gen_hash_map(file);
-                if !cli.min {
-                    lib::print_result(top(map, n));
+                if cli.min {
+                    top(map, n).iter().for_each(|i| println!("{}:{}", i.0, i.1))
                 }
             }
         }
@@ -92,15 +95,14 @@ fn main() {
             let n = arg.num.unwrap_or_else(|| MIN);
             if n < 1 {
                 println!("N must be bigger than 0");
-                std::process::exit(1);
+                exit(1);
             }
             if !cli.sudo {
                 let map: HashMap<String, usize> = zsh::gen_hash_map(file);
-                if !cli.min {
-                    lib::print_result(top(map, n));
+                if cli.min {
+                    bot(map, n).iter().for_each(|i| println!("{}:{}", i.0, i.1))
                 }
             }
         }
-        _ => {}
     }
 }

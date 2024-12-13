@@ -30,7 +30,6 @@ pub fn gen_hash_map(file: File) -> HashMap<String, usize> {
 
 #[allow(dead_code)]
 fn collector(iter: &mut Bytes<BufReader<File>>, prog: &mut Vec<u8>) -> bool {
-    // skips ": NUM:0;"
     for _ in 0..SKIP_RANGE {
         iter.next();
     }
@@ -85,7 +84,7 @@ mod test {
     use super::*;
     use std::{path::Path, usize};
 
-    fn iterator(path: &str) -> Bytes<BufReader<File>> {
+    fn file_iterator(path: &str) -> Bytes<BufReader<File>> {
         let file = open_file(path);
         BufReader::with_capacity(file.metadata().unwrap().len() as usize, file).bytes()
     }
@@ -108,45 +107,22 @@ mod test {
     #[test]
     fn test_collector_build_single() {
         let mut prog: Vec<u8> = Vec::new();
-        let mut iter = iterator("tests/collector-build-single");
+        let mut iter = file_iterator("tests/collector-build-single");
         iter.next();
         let _ = collector(&mut iter, &mut prog);
         assert_eq!(prog, vec_u8_from_str("systemctl"));
     }
 
     #[test]
-    fn test_collector_build_map() {
-        let map = HashMap::from([
-            (String::from("ll"), 3),
-            (String::from("systemctl"), 4),
-            (String::from("grep"), 2),
-            (String::from("free"), 1),
-            (String::from("Hyprland"), 1),
-            (String::from("mpv"), 1),
-            (String::from("eval"), 1),
-            (String::from("cd"), 1),
-        ]);
-        assert_eq!(gen_hash_map(open_file("tests/collector-build-map")), map);
-    }
-
-    #[test]
     fn test_collector_multi() {
         let mut first: Vec<u8> = Vec::new();
         let mut second: Vec<u8> = Vec::new();
-        let mut iter = iterator("tests/collector-2-strings");
+        let mut iter = file_iterator("tests/collector-2-strings");
         iter.next();
         let _ = collector(&mut iter, &mut first);
         let _ = collector(&mut iter, &mut second);
 
         assert_eq!(first, vec_u8_from_str("systemctl"));
-        // grep is not even being read here, maybe stop patern does not work?
         assert_eq!(second, vec_u8_from_str("grep"));
-    }
-
-    // tests if skip section can infact skip past utf-16 chars
-    #[test]
-    fn test_collector_build_map_utf_16() {
-        let map = HashMap::from([(String::from("mpv"), 7)]);
-        assert_eq!(gen_hash_map(open_file("tests/map-utf-16")), map);
     }
 }
