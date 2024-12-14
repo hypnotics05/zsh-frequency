@@ -11,8 +11,6 @@ use std::fs::File;
 use std::path::{Path, PathBuf};
 use std::process::exit;
 
-// TODO: Display results
-
 #[derive(Parser, Debug)]
 #[command(version,about,long_about=None)]
 struct Cli {
@@ -23,10 +21,6 @@ struct Cli {
     /// Toggles minimal graph
     #[arg(short, long)]
     min: bool,
-
-    /// Counts sudo as a seperate command
-    #[arg(short, long)]
-    sudo: bool,
 
     #[command(subcommand)]
     command: Commands,
@@ -52,9 +46,6 @@ fn main() {
     let cli = Cli::parse();
 
     // Specs:
-    // --file PATH read from file
-    // -m create minimal graph
-    // -s don't count sudo as seperate command
     // top N returns the N top used results
     // bot N returns the N least used results
     // Needs more options for Filter, and sorting
@@ -72,10 +63,7 @@ fn main() {
         Ok(file) => file,
     };
 
-    // HACK:
-
-    //println!("{}", final_path.display());
-
+    println!("{:?}", final_path.as_os_str());
     match &cli.command {
         Commands::Top(arg) => {
             let n = arg.num.unwrap_or_else(|| MIN);
@@ -84,11 +72,9 @@ fn main() {
                 println!("N must be bigger than 0");
                 exit(1);
             }
-            if !cli.sudo {
-                let map: HashMap<String, usize> = zsh::gen_hash_map(file);
-                if cli.min {
-                    top(map, n).iter().for_each(|i| println!("{}:{}", i.0, i.1))
-                }
+            let map: HashMap<String, usize> = zsh::map(file);
+            if cli.min {
+                top(map, n).iter().for_each(|i| println!("{}:{}", i.0, i.1))
             }
         }
         Commands::Bot(arg) => {
@@ -97,11 +83,9 @@ fn main() {
                 println!("N must be bigger than 0");
                 exit(1);
             }
-            if !cli.sudo {
-                let map: HashMap<String, usize> = zsh::gen_hash_map(file);
-                if cli.min {
-                    bot(map, n).iter().for_each(|i| println!("{}:{}", i.0, i.1))
-                }
+            let map: HashMap<String, usize> = zsh::map(file);
+            if cli.min {
+                bot(map, n).iter().for_each(|i| println!("{}:{}", i.0, i.1))
             }
         }
     }

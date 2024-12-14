@@ -4,125 +4,57 @@ const SKIP_RANGE: u8 = 14; // How many chars to skip to get to cmd
 // TODO: add support for sudo, both by reading command after sudo and counting the number of sudo
 // TODO: Add support to read inline commands
 
-use std::{
-    collections::HashMap,
-    fs::File,
-    io::{BufReader, Bytes, Read},
-};
+use std::{collections::HashMap, fs::File, io::Read};
+
+use regex::Regex;
 
 #[allow(dead_code)]
-pub fn gen_hash_map(file: File) -> HashMap<String, usize> {
+pub fn map(mut file: File) -> HashMap<String, usize> {
+    let base = Regex::new(r";\s*[^ \n]+").unwrap();
+    let sudo = Regex::new(r";\s*sudo\s*[^ \n]+").unwrap();
     let mut map: HashMap<String, usize> = HashMap::new();
-    let mut prog: Vec<u8> = Vec::new(); // here is where we collect
-    let mut iter = BufReader::with_capacity(file.metadata().unwrap().len() as usize, file).bytes();
-    let mut more: bool = true;
-    let mut bin: String;
-    iter.next();
-    while more {
-        more = collector(&mut iter, &mut prog);
-        bin = String::from_utf8(prog.clone()).unwrap();
-        let key = map.entry(bin).or_insert(0);
-        *key += 1;
-        let _ = &mut prog.clear();
-    }
+    let mut line: String = String::new();
+    let _ = file.read_to_string(&mut line);
+
+    let mut store = collect(line, base, sudo);
+    store.into_iter().for_each(|s| {
+        let val = map.entry(s).or_insert(0);
+        *val += 1;
+    });
+
+    // TODO: Read in nested expressions from $(expr)
+
+    // FIXME: I think large files are not supported? Should break it up in smaller strings
+
     map
 }
 
-#[allow(dead_code)]
-fn collector(iter: &mut Bytes<BufReader<File>>, prog: &mut Vec<u8>) -> bool {
-    for _ in 0..SKIP_RANGE {
-        iter.next();
-    }
-    let mut str1: u8 = 0;
-    let mut str2: u8;
-    // tries to build string
-    loop {
-        match iter.next() {
-            Some(x) => match x {
-                Ok(y) => {
-                    if y != ' ' as u8 {
-                        if y == '\n' as u8 {
-                            str1 = y;
-                            break;
-                        }
-                        prog.push(y);
-                    } else {
-                        break;
-                    }
-                }
-                _ => continue, // catching any error here because Err doesn't work?
-            },
-            // Might not be nescesary as if this where to occur, the file is missformatted
-            // Should we panic here?
-            None => return false, // exit function, no more file to read
-        }
-    }
-    loop {
-        match iter.next() {
-            Some(x) => match x {
-                Ok(x) => {
-                    str2 = str1;
-                    str1 = x;
-                    // HACK: debug statment to determine what the stream contains
-                    // println!("Reading: 1 - {} && 2 - {}", str1 as char, str2 as char);
-                    if str1 == ':' as u8 && str2 == '\n' as u8 {
-                        return true;
-                    }
-                }
-                _ => {
-                    str2 = str1; // still don't know how to fix this
-                    str1 = ' ' as u8;
-                }
-            },
-            None => return false,
-        }
-    }
-}
+// REF: use regex instead of manually parsing
+fn collect(line: String, base: Regex, sudo: Regex) -> Vec<String> {
+    /*
+     * Get all base casses out from string, matches any word starting with a semicolon and any
+     * amount of space and ends with more space, a semicolon or is at the end of it's line.
+     *
+     * Check for any occurences of sudo, if there are any then use the sudo expression to extract
+     * them.
+     *
+     * Then we find all text trapped in $() expressions, and re run them through the collector
+     */
+    let mut store = Vec::new();
 
-#[cfg(test)]
-mod test {
-    use super::*;
-    use std::{path::Path, usize};
+    base.find_iter(line.as_str()).for_each(|s| {
+        let mut matched = String::from(s.as_str());
+        matched.remove(0);
+        store.push(matched.trim().to_string());
+    });
 
-    fn file_iterator(path: &str) -> Bytes<BufReader<File>> {
-        let file = open_file(path);
-        BufReader::with_capacity(file.metadata().unwrap().len() as usize, file).bytes()
-    }
+    sudo.find_iter(line.as_str()).for_each(|s| {
+        let mut matched = String::from(s.as_str());
+        matched.remove(0);
+        let mut sudo = matched.trim().split(' ');
+        store.push(sudo.next().unwrap().to_string());
+        store.push(sudo.next().unwrap().to_string());
+    });
 
-    fn open_file(path: &str) -> File {
-        match File::open(Path::new(&path)) {
-            Err(err) => panic!("Couldn't open {}: {}", path, err),
-            Ok(file) => return file,
-        }
-    }
-
-    fn vec_u8_from_str(target: &str) -> Vec<u8> {
-        let mut vec: Vec<u8> = Vec::new();
-        for c in target.chars() {
-            vec.push(c as u8);
-        }
-        vec
-    }
-
-    #[test]
-    fn test_collector_build_single() {
-        let mut prog: Vec<u8> = Vec::new();
-        let mut iter = file_iterator("tests/collector-build-single");
-        iter.next();
-        let _ = collector(&mut iter, &mut prog);
-        assert_eq!(prog, vec_u8_from_str("systemctl"));
-    }
-
-    #[test]
-    fn test_collector_multi() {
-        let mut first: Vec<u8> = Vec::new();
-        let mut second: Vec<u8> = Vec::new();
-        let mut iter = file_iterator("tests/collector-2-strings");
-        iter.next();
-        let _ = collector(&mut iter, &mut first);
-        let _ = collector(&mut iter, &mut second);
-
-        assert_eq!(first, vec_u8_from_str("systemctl"));
-        assert_eq!(second, vec_u8_from_str("grep"));
-    }
+    store
 }
