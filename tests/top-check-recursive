@@ -1,0 +1,70 @@
+: 1707624553:0;dir_array=$( read -a ls -d */ )
+: 1707624574:0;dir_array=$( read ls -d */ )
+: 1707624581:0;read --help
+: 1707624776:0;cd novels/Archive
+: 1707625072:0;cd books/novels/Archive/backups/test/Author
+: 1707625078:0;cd Andy\ Weir
+: 1707625086:0;ls *.epub
+: 1707625170:0;mkdir Artemis.epub
+: 1707625424:0;mkdir Artemis.epub.dir
+: 1707625428:0;cd Artemis.epub.dir
+: 1707625437:0;mv ../Artemis.epub ./
+: 1707625446:0;unzip *
+: 1707625454:0;rm Artemis.epub
+: 1707625924:0;rm .tar
+: 1707625932:0;rm META-INF
+: 1707625934:0;rm META-INF.tar
+: 1707627130:0;rm -r Artemis.epub.dir
+: 1707627153:0;mkdir The\ Martian.epub.dir
+: 1707627156:0;cd The\ Martian.epub.dir
+: 1707627165:0;mv ../The\ Martian.epub ./
+: 1707627174:0;unzip ./*
+: 1707627181:0;rm The\ Martian.epub
+: 1707627223:0;epub_dirs=$( ls -d ./*/ )
+: 1707627445:0;mv The\ Martian.epub.dir The\ Martian.epub
+: 1707627463:0;tar -cf The\ Martian.epub.tar The\ Martian.epub
+: 1707627471:0;rm -r The\ Martian.epub
+: 1707627509:0;cd ../Stephen\ King
+: 1707627573:0;epub_files=$( ls ./*.epub)
+: 1707627693:0;for i in ${epub_files};do\
+: 1734145478:0;cargo run -- -m --file /home/hypnotics/.zsh_history top 2
+: 1734146455:0;git status
+: 1734146458:0;cd ..
+: 1734146460:0;git status
+: 1734200187:0;onefetch
+: 1734205879:0;nv
+: 1734205923:0;cargo run -- -m --file /home/hypnotics/.zsh_history top 2
+: 1734206140:0;file Cargo.lock
+: 1734206147:0;file ~/.zsh_history
+: 1734207468:0;cargo run -- -m --file /home/hypnotics/.zsh_history top 2
+: 1734207685:0;cargo run -- -m --file "tests/collector-build-map" top 2
+: 1734211590:0;nv
+: 1734212030:0;cargo run -- -m --file "tests/collector-build-map" top 2
+: 1734212050:0;cargo run -- -m  top 2
+: 1734212056:0;cargo run -- -m  top 
+: 1734212094:0;cat ~/.zsh_history | grep "ll"
+: 1734212102:0;cat ~/.zsh_history | grep ";ll"
+: 1734212115:0;cat ~/.zsh_history | grep ";ll" | tee e
+: 1734212118:0;nv e
+: 1734212130:0;cargo run -- -m  top 
+: 1734212134:0;cargo run -- -m  top 25
+: 1734214884:0;nv tests/top-check-recursive
+: 1707624937:0;for i in ${dir_array};do\
+echo $i\
+done
+: 1707624968:0;for i in ${dir_array};do\
+echo 1\
+done
+: 1707625770:0;for j in ${epub_dirs};do\
+tar -cvf "$j".tar "$j"\
+done
+: 1707625794:0;epub_dirs=$( ls -d */ )
+: 1707625817:0;for i in ${epub_dirs}; do\
+echo $i\
+done
+: 1707625826:0;for j in ${epub_dirs};do\
+tar -cvf "$j.tar" "$j"\
+done
+: 1707625900:0;for i in ${epub_dirs}; do\
+echo "${i::-1}"\
+done
