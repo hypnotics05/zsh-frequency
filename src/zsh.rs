@@ -9,8 +9,8 @@ use regex::Regex;
 
 #[allow(dead_code)]
 pub fn map(mut file: File) -> HashMap<String, usize> {
-    let base = Regex::new(r"[;|\|]\s*[^ \n=\\]+").unwrap();
-    let sudo = Regex::new(r"[;|\|]\s*sudo\s*[^ \n=\\]+").unwrap();
+    let base = Regex::new(r"(;|\||\\\n)\s*[^ \n=\\]+[^ \n=\\]").unwrap();
+    let sudo = Regex::new(r"(;|\||\\\n)\s*sudo\s*[^ \n=\\]+[^ \n=\\]").unwrap();
     let mut map: HashMap<String, usize> = HashMap::new();
 
     let mut buf = Vec::new();
@@ -42,8 +42,6 @@ pub fn map(mut file: File) -> HashMap<String, usize> {
         let val = map.entry(s).or_insert(0);
         *val += 1;
     });
-
-    // TODO: Read in nested expressions from $(expr)
 
     map
 }
