@@ -13,18 +13,24 @@ pub fn map(mut file: File) -> HashMap<String, usize> {
     let base = Regex::new(r";\s*[^ \n]+").unwrap();
     let sudo = Regex::new(r";\s*sudo\s*[^ \n]+").unwrap();
     let mut map: HashMap<String, usize> = HashMap::new();
-    let mut line: String = String::new();
-    let _ = file.read_to_string(&mut line);
 
-    let mut store = collect(line, base, sudo);
+    let mut buf = Vec::new();
+    let res = file.read_to_end(&mut buf);
+    match res {
+        Ok(_) => {}
+        Err(e) => {
+            println!("Failed to read from file: {}", e);
+        }
+    }
+    let line = String::from_utf8_lossy(&buf).to_string();
+
+    let store = collect(line, base, sudo);
     store.into_iter().for_each(|s| {
         let val = map.entry(s).or_insert(0);
         *val += 1;
     });
 
     // TODO: Read in nested expressions from $(expr)
-
-    // FIXME: I think large files are not supported? Should break it up in smaller strings
 
     map
 }
