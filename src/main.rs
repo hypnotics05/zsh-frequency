@@ -4,7 +4,7 @@ mod zsh;
 
 use clap::{Args, Parser, Subcommand};
 use core::panic;
-use outputs::{bot, top};
+use outputs::{bot, print, rand, top};
 use std::collections::HashMap;
 use std::env;
 use std::fs::File;
@@ -28,6 +28,8 @@ enum Commands {
     Top(AddArgs),
     /// Shows the N least used commands
     Bot(AddArgs),
+    /// Shows N random commands
+    Rand(AddArgs),
 }
 
 #[derive(Args, Debug)]
@@ -61,7 +63,7 @@ fn main() {
                 exit(1);
             }
             let map: HashMap<String, usize> = zsh::map(file);
-            top(map, n).iter().for_each(|i| println!("{}:{}", i.0, i.1))
+            outputs::print(top(map, n))
         }
         Commands::Bot(arg) => {
             let n = arg.num.unwrap_or_else(|| MIN);
@@ -70,7 +72,16 @@ fn main() {
                 exit(1);
             }
             let map: HashMap<String, usize> = zsh::map(file);
-            bot(map, n).iter().for_each(|i| println!("{}:{}", i.0, i.1))
+            outputs::print(bot(map, n))
+        }
+        Commands::Rand(arg) => {
+            let n = arg.num.unwrap_or_else(|| MIN);
+            if n < 1 {
+                println!("N must be bigger than 0");
+                exit(1);
+            }
+            let map = zsh::map(file);
+            outputs::print(rand(map, n))
         }
     }
 }

@@ -1,7 +1,8 @@
-#[allow(dead_code)]
-const SKIP_RANGE: u8 = 14; // How many chars to skip to get to cmd
-
-// TODO: Unhandled edge cases ";WORD" will be matched even if it's inline
+// TODO: Unhandled edge cases
+//
+// ";WORD" will be matched even if it's inline
+// 150 1
+//
 
 use std::{collections::HashMap, fs::File, io::Read};
 
@@ -9,8 +10,8 @@ use regex::Regex;
 
 #[allow(dead_code)]
 pub fn map(mut file: File) -> HashMap<String, usize> {
-    let base = Regex::new(r"(;|\||\\\n)\s*[^ \n=\\]+[^ \n=\\]").unwrap();
-    let sudo = Regex::new(r"(;|\||\\\n)\s*sudo\s*[^ \n=\\]+[^ \n=\\]").unwrap();
+    let base = Regex::new(r"(;|\||\\\n)\s*[\w.\\\/~]*[\w]").unwrap();
+    let sudo = Regex::new(r"(;|\||\\\n)\s*sudo\s*[\w.\\\/~]*[\w]").unwrap();
     let mut map: HashMap<String, usize> = HashMap::new();
 
     let mut buf = Vec::new();

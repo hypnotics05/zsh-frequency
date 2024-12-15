@@ -21,3 +21,15 @@ pub fn bot(map: HashMap<String, usize>, n: usize) -> Vec<(String, usize)> {
         .map(|(key, val)| (key.clone(), *val))
         .collect::<Vec<(String, usize)>>()
 }
+
+pub fn rand(map: HashMap<String, usize>, n: usize) -> Vec<(String, usize)> {
+    map.keys()
+        .into_iter()
+        .take(n)
+        .map(|k| (String::from(k), map[k]))
+        .collect()
+}
+
+pub fn print(vector: Vec<(String, usize)>) {
+    vector.into_iter().for_each(|p| println!("{}:{}", p.0, p.1))
+}
