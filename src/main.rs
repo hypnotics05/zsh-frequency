@@ -4,7 +4,7 @@ mod zsh;
 
 use clap::{Args, Parser, Subcommand};
 use core::panic;
-use outputs::{bot, print, rand, top};
+use outputs::{bot, get, print, rand, top};
 use std::collections::HashMap;
 use std::env;
 use std::fs::File;
@@ -25,16 +25,22 @@ struct Cli {
 #[derive(Subcommand, Debug)]
 enum Commands {
     /// Shows the N most used commands
-    Top(AddArgs),
+    Top(Int),
     /// Shows the N least used commands
-    Bot(AddArgs),
+    Bot(Int),
     /// Shows N random commands
-    Rand(AddArgs),
+    Rand(Int),
+    /// Gets the stats for PROG
+    Get(Name),
 }
 
 #[derive(Args, Debug)]
-struct AddArgs {
+struct Int {
     num: Option<usize>,
+}
+#[derive(Args, Debug)]
+struct Name {
+    name: Option<String>,
 }
 
 fn main() {
@@ -82,6 +88,14 @@ fn main() {
             }
             let map = zsh::map(file);
             outputs::print(rand(map, n))
+        }
+        Commands::Get(arg) => {
+            let n = arg.name.clone().unwrap_or_else(|| {
+                eprintln!("Failed to retrieve blank PROG name");
+                exit(1)
+            });
+            let val = get(zsh::map(file), n);
+            println!("{}:{}", val.0, val.1)
         }
     }
 }

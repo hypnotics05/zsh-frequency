@@ -30,6 +30,10 @@ pub fn rand(map: HashMap<String, usize>, n: usize) -> Vec<(String, usize)> {
         .collect()
 }
 
+pub fn get(map: HashMap<String, usize>, key: String) -> (String, usize) {
+    (key.to_string(), map[key.as_str()])
+}
+
 pub fn print(vector: Vec<(String, usize)>) {
     vector.into_iter().for_each(|p| println!("{}:{}", p.0, p.1))
 }
