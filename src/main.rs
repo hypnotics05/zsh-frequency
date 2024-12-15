@@ -53,7 +53,6 @@ fn main() {
         Ok(file) => file,
     };
 
-    println!("{:?}", final_path.as_os_str());
     match &cli.command {
         Commands::Top(arg) => {
             let n = arg.num.unwrap_or_else(|| MIN);

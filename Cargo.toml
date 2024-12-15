@@ -1,7 +1,14 @@
 [package]
 name = "zsh-frequency"
+description = "A tool to count program names in a zsh_history file"
+authors = ["hypnotics <devhypnotics@proton.me>"]
 version = "0.1.0"
 edition = "2021"
+license = "MIT"
+readme = "README.org"
+categories = ["command-line-utilities"]
+repository = "https://github.com/hypnotics-dev/zsh-frequency"
+homepage= "https://github.com/hypnotics-dev/zsh-frequency"
 
 [dependencies]
 clap = { version = "4.5.20", features = ["derive"] }
