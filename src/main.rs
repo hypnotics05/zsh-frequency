@@ -1,10 +1,10 @@
-mod helpers;
+mod outputs;
 mod test;
 mod zsh;
 
 use clap::{Args, Parser, Subcommand};
 use core::panic;
-use helpers::{bot, top};
+use outputs::{bot, top};
 use std::collections::HashMap;
 use std::env;
 use std::fs::File;
@@ -17,10 +17,6 @@ struct Cli {
     /// Use file instead of HISTFILE or $HOME/.zsh_histfile
     #[arg(long, value_name = "FILE")]
     file: Option<PathBuf>,
-
-    /// Toggles minimal graph
-    #[arg(short, long)]
-    min: bool,
 
     #[command(subcommand)]
     command: Commands,
@@ -45,12 +41,6 @@ fn main() {
 
     let cli = Cli::parse();
 
-    // Specs:
-    // top N returns the N top used results
-    // bot N returns the N least used results
-    // Needs more options for Filter, and sorting
-
-    // creates a file_path
     let env_path = env::var("HISTFILE").unwrap_or(format!(
         "{}/.zsh_history",
         env::var("HOME").expect("HOME var is not set")
@@ -67,15 +57,12 @@ fn main() {
     match &cli.command {
         Commands::Top(arg) => {
             let n = arg.num.unwrap_or_else(|| MIN);
-            //println!("{n}");
             if n < 1 {
                 println!("N must be bigger than 0");
                 exit(1);
             }
             let map: HashMap<String, usize> = zsh::map(file);
-            if cli.min {
-                top(map, n).iter().for_each(|i| println!("{}:{}", i.0, i.1))
-            }
+            top(map, n).iter().for_each(|i| println!("{}:{}", i.0, i.1))
         }
         Commands::Bot(arg) => {
             let n = arg.num.unwrap_or_else(|| MIN);
@@ -84,9 +71,7 @@ fn main() {
                 exit(1);
             }
             let map: HashMap<String, usize> = zsh::map(file);
-            if cli.min {
-                bot(map, n).iter().for_each(|i| println!("{}:{}", i.0, i.1))
-            }
+            bot(map, n).iter().for_each(|i| println!("{}:{}", i.0, i.1))
         }
     }
 }
