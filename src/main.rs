@@ -20,6 +20,10 @@ struct Cli {
 
     #[command(subcommand)]
     command: Commands,
+
+    /// Prints the sum of the values from a query
+    #[arg(long, short)]
+    length: bool,
 }
 
 #[derive(Subcommand, Debug)]
@@ -32,6 +36,8 @@ enum Commands {
     Rand(Int),
     /// Gets the stats for PROG
     Get(Name),
+    /// Prints all PROG names
+    All,
 }
 
 #[derive(Args, Debug)]
@@ -69,7 +75,18 @@ fn main() {
                 exit(1);
             }
             let map: HashMap<String, usize> = zsh::map(file);
-            outputs::print(top(map, n))
+            let values = top(map, n);
+            if cli.length {
+                println!(
+                    "Length of query:{}",
+                    values.iter().fold(0, |mut sum, val| {
+                        sum += val.1;
+                        sum
+                    })
+                );
+            }
+
+            outputs::print(values)
         }
         Commands::Bot(arg) => {
             let n = arg.num.unwrap_or_else(|| MIN);
@@ -78,7 +95,17 @@ fn main() {
                 exit(1);
             }
             let map: HashMap<String, usize> = zsh::map(file);
-            outputs::print(bot(map, n))
+            let values = bot(map, n);
+            if cli.length {
+                println!(
+                    "Length of query:{}",
+                    values.iter().fold(0, |mut sum, val| {
+                        sum += val.1;
+                        sum
+                    })
+                );
+            }
+            outputs::print(values)
         }
         Commands::Rand(arg) => {
             let n = arg.num.unwrap_or_else(|| MIN);
@@ -87,15 +114,44 @@ fn main() {
                 exit(1);
             }
             let map = zsh::map(file);
-            outputs::print(rand(map, n))
+            let values = rand(map, n);
+            if cli.length {
+                println!(
+                    "Length of query:{}",
+                    values.iter().fold(0, |mut sum, val| {
+                        sum += val.1;
+                        sum
+                    })
+                );
+            }
+            outputs::print(values)
         }
         Commands::Get(arg) => {
             let n = arg.name.clone().unwrap_or_else(|| {
                 eprintln!("Failed to retrieve blank PROG name");
                 exit(1)
             });
-            let val = get(zsh::map(file), n);
-            println!("{}:{}", val.0, val.1)
+            let map = zsh::map(file);
+            let values = get(map, n);
+            if cli.length {
+                println!("Length of query:{}", values.1);
+            }
+            println!("{}:{}", values.0, values.1)
+        }
+        Commands::All => {
+            let map = zsh::map(file);
+            let n = map.len();
+            let values = top(map, n);
+            if cli.length {
+                println!(
+                    "Length of query:{}",
+                    values.iter().fold(0, |mut sum, val| {
+                        sum += val.1;
+                        sum
+                    })
+                );
+            }
+            outputs::print(values);
         }
     }
 }

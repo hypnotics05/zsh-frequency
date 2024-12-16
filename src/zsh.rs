@@ -10,8 +10,8 @@ use regex::Regex;
 
 #[allow(dead_code)]
 pub fn map(mut file: File) -> HashMap<String, usize> {
-    let base = Regex::new(r"(;|\||\\\n)\s*[\w.\\\/~]*[\w]").unwrap();
-    let sudo = Regex::new(r"(;|\||\\\n)\s*sudo\s*[\w.\\\/~]*[\w]").unwrap();
+    let base = Regex::new(r"(;|\||\\\n|&)\s*[\w.\\\/~]*[\w]").unwrap();
+    let sudo = Regex::new(r"(;|\||\\\n|&)\s*sudo\s*[\w.\\\/~]*[\w]").unwrap();
     let mut map: HashMap<String, usize> = HashMap::new();
 
     let mut buf = Vec::new();
