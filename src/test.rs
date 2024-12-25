@@ -25,6 +25,7 @@ mod test {
                 (String::from("mpv"), 1),
                 (String::from("eval"), 1),
                 (String::from("cd"), 1),
+                (String::from("ssh"), 1),
             ])
         );
     }
