@@ -1,5 +1,6 @@
 #[cfg(test)]
 mod test {
+    use outputs::get;
     use zsh::map;
 
     use crate::*;
@@ -47,6 +48,18 @@ mod test {
                 (String::from("ll"), 3 as usize),
             ],
             top(map(open_file("tests/collector-build-map")), 2)
+        )
+    }
+
+    #[test]
+    /// Verifies that non-valid keys do not crash the program
+    fn test_get() {
+        assert_eq!(
+            (String::from("foobar"), 0 as usize),
+            get(
+                map(open_file("tests/collector-build-map")),
+                String::from("foobar")
+            )
         )
     }
 }

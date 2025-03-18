@@ -31,7 +31,11 @@ pub fn rand(map: HashMap<String, usize>, n: usize) -> Vec<(String, usize)> {
 }
 
 pub fn get(map: HashMap<String, usize>, key: String) -> (String, usize) {
-    (key.to_string(), map[key.as_str()])
+    let val = match map.get(key.as_str()) {
+        Some (x) => {*x}
+        None => {0}
+    };
+    (key.to_string(), val)
 }
 
 pub fn print(vector: Vec<(String, usize)>) {
