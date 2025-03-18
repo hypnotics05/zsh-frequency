@@ -4,7 +4,7 @@ mod zsh;
 
 use clap::{Args, Parser, Subcommand};
 use core::panic;
-use outputs::{bot, get, print, rand, top};
+use outputs::{bot, get,rand, top};
 use std::collections::HashMap;
 use std::env;
 use std::fs::File;

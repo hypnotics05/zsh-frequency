@@ -8,15 +8,14 @@ use std::{collections::HashMap, fs::File, io::Read};
 
 use regex::Regex;
 
-#[allow(dead_code)]
+/// Returns a hashmap of all programs names and the number of time they where found
 pub fn map(mut file: File) -> HashMap<String, usize> {
     let base = Regex::new(r"(;|\||\\\n|&)\s*[\w.\\\/~]*[\w]").unwrap();
     let sudo = Regex::new(r"(;|\||\\\n|&)\s*sudo\s*[\w.\\\/~]*[\w]").unwrap();
     let mut map: HashMap<String, usize> = HashMap::new();
 
     let mut buf = Vec::new();
-    let res = file.read_to_end(&mut buf);
-    match res {
+    match file.read_to_end(&mut buf) {
         Ok(_) => {}
         Err(e) => {
             println!("Failed to read from file: {}", e);
