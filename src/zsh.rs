@@ -18,7 +18,7 @@ pub fn map(mut file: File) -> HashMap<String, usize> {
     match file.read_to_end(&mut buf) {
         Ok(_) => {}
         Err(e) => {
-            println!("Failed to read from file: {}", e);
+            eprintln!("Failed to read from file: {}", e);
         }
     }
     let line = String::from_utf8_lossy(&buf).to_string();

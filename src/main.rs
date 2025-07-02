@@ -4,7 +4,7 @@ mod zsh;
 
 use clap::{Args, Parser, Subcommand};
 use core::panic;
-use outputs::{bot, get,rand, top};
+use outputs::{bot, get, println, rand, top};
 use std::collections::HashMap;
 use std::env;
 use std::fs::File;
@@ -71,19 +71,19 @@ fn main() {
         Commands::Top(arg) => {
             let n = arg.num.unwrap_or_else(|| MIN);
             if n < 1 {
-                println!("N must be bigger than 0");
+                eprintln!("N must be bigger than 0");
                 exit(1);
             }
             let map: HashMap<String, usize> = zsh::map(file);
             let values = top(map, n);
             if cli.length {
-                println!(
+                println(format!(
                     "Length of query:{}",
                     values.iter().fold(0, |mut sum, val| {
                         sum += val.1;
                         sum
                     })
-                );
+                ));
             }
 
             outputs::print(values)
@@ -91,38 +91,38 @@ fn main() {
         Commands::Bot(arg) => {
             let n = arg.num.unwrap_or_else(|| MIN);
             if n < 1 {
-                println!("N must be bigger than 0");
+                eprintln!("N must be bigger than 0");
                 exit(1);
             }
             let map: HashMap<String, usize> = zsh::map(file);
             let values = bot(map, n);
             if cli.length {
-                println!(
+                println(format!(
                     "Length of query:{}",
                     values.iter().fold(0, |mut sum, val| {
                         sum += val.1;
                         sum
                     })
-                );
+                ));
             }
             outputs::print(values)
         }
         Commands::Rand(arg) => {
             let n = arg.num.unwrap_or_else(|| MIN);
             if n < 1 {
-                println!("N must be bigger than 0");
+                eprintln!("N must be bigger than 0");
                 exit(1);
             }
             let map = zsh::map(file);
             let values = rand(map, n);
             if cli.length {
-                println!(
+                println(format!(
                     "Length of query:{}",
                     values.iter().fold(0, |mut sum, val| {
                         sum += val.1;
                         sum
                     })
-                );
+                ));
             }
             outputs::print(values)
         }
@@ -134,22 +134,22 @@ fn main() {
             let map = zsh::map(file);
             let values = get(map, n);
             if cli.length {
-                println!("Length of query:{}", values.1);
+                println(format!("Length of query:{}", values.1));
             }
-            println!("{}:{}", values.0, values.1)
+            println(format!("{}:{}", values.0, values.1));
         }
         Commands::All => {
             let map = zsh::map(file);
             let n = map.len();
             let values = top(map, n);
             if cli.length {
-                println!(
+                println(format!(
                     "Length of query:{}",
                     values.iter().fold(0, |mut sum, val| {
                         sum += val.1;
                         sum
                     })
-                );
+                ));
             }
             outputs::print(values);
         }

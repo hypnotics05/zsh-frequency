@@ -1,4 +1,8 @@
-use std::{collections::HashMap, usize};
+use std::{
+    collections::HashMap,
+    io::{self, ErrorKind, Write},
+    process, usize,
+};
 
 pub fn top(map: HashMap<String, usize>, n: usize) -> Vec<(String, usize)> {
     let mut origin: Vec<_> = map.iter().collect();
@@ -32,12 +36,24 @@ pub fn rand(map: HashMap<String, usize>, n: usize) -> Vec<(String, usize)> {
 
 pub fn get(map: HashMap<String, usize>, key: String) -> (String, usize) {
     let val = match map.get(key.as_str()) {
-        Some (x) => {*x}
-        None => {0}
+        Some(x) => *x,
+        None => 0,
     };
     (key.to_string(), val)
 }
 
 pub fn print(vector: Vec<(String, usize)>) {
-    vector.into_iter().for_each(|p| println!("{}:{}", p.0, p.1))
+    vector
+        .into_iter()
+        .for_each(|p| println(format!("{} {}", p.0, p.1)))
+}
+
+pub fn println(str: String) {
+    let mut stdout = io::stdout().lock();
+    if let Err(e) = writeln!(stdout, "{}", str) {
+        if e.kind() == ErrorKind::BrokenPipe {
+            process::exit(0);
+        }
+        panic!("stdout error: {}", e);
+    }
 }
